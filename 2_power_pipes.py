@@ -20,7 +20,7 @@ def sort_lines(lines):
                 cordinates.append((x1, y1, x2, y2))
     xs = np.array(xs)
     cordinates = np.array(cordinates)[xs.argsort()]
-    return cordinates
+    return cordinates.tolist()
 
 def filter_distances(lines, thresh = 5):
     cordinates = lines # sort_lines(lines)
@@ -97,6 +97,42 @@ def filter_with_slopes(lines, ts, ti):
     info_array.append('Last element')
 
     return lines[result_array], info_array
+
+def m_filter_with_slopes(lines, ts_low, ts_high, ti_low, ti_high):
+    result_array = []
+    another_array = []
+    lines = sort_lines(lines)
+    for line in lines:
+        if (np.abs(line[1] - line[3]) < 10) or (np.abs(line[0] - line[2]) < 2):
+                continue
+        slope, intercept = get_slop_intercept(line)
+        slope = 0 if slope is None else slope
+        intercept = 0 if intercept is None else intercept
+
+        if len(result_array) == 0:
+            result_array.append(line)
+            continue
+
+        for l2 in result_array:
+            l2_slope, l2_intercept = get_slop_intercept(l2)     
+            l2_slope = 0 if l2_slope is None else l2_slope
+            l2_intercept = 0 if l2_intercept is None else l2_intercept
+
+            slope_ratio = abs(l2_slope/slope) if slope != 0 else 0
+            intercept_ratio = abs(l2_intercept/intercept) if intercept != 0 else 0
+            
+            print('[*_*] Info :', slope_ratio, intercept_ratio)
+            print('[+] current:', slope, intercept)
+            print('[-] comp:', l2_slope, l2_intercept)
+            print('[++] lines :', line, l2)
+            if (slope_ratio < ts_low or slope_ratio > ts_high) and (intercept_ratio < ti_low or intercept_ratio > ti_high):
+                if line not in result_array and (slope, intercept) not in another_array:
+                    print('[!] Rigistered!')
+                    result_array.append(line)
+                    another_array.append((slope, intercept))
+            print('====================================================================')
+
+    return result_array
 
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
@@ -226,14 +262,13 @@ for x1, y1, x2, y2  in new_lines:
 cv2.imshow('res', cv2.resize(lineImage, (800, 600)))
 cv2.imwrite(os.path.join(results_path, 'res.jpg'), cv2.resize(lineImage, (800, 600)))
 
-filtered_lines, info = filter_with_slopes(lines, 0.92, 0.6)
-print('[--]', filtered_lines.shape)
+filtered_lines = m_filter_with_slopes(lines, 0.95, 1.05, 0.95, 1.05)
+print('[--]', len(filtered_lines))
 
-for (x1, y1, x2, y2), i  in zip(np.squeeze(filtered_lines), info):
+for x1, y1, x2, y2  in filtered_lines:
     cv2.line(clineImage, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
-    print('[*_*] Info :', i)
-    cv2.waitKey(0)
+
+cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
 cv2.imwrite(os.path.join(results_path, 'res filtered.jpg'), cv2.resize(clineImage, (800, 600)))
 
 
