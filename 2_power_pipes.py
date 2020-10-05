@@ -296,8 +296,6 @@ cv2.imwrite(os.path.join(results_path, 'res filtered.jpg'), cv2.resize(clineImag
 # cv2.imshow('pool', cv2.resize(lineImage, (800, 600)))
 
 cv2.waitKey(0)
-
-
 cv2.destroyAllWindows()
 
 # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
