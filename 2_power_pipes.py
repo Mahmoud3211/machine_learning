@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-# from scipy.spatial import distance
+from scipy.spatial import distance
 import pandas as pd
 import os
 
