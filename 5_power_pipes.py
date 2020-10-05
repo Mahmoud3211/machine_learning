@@ -19,6 +19,14 @@ def sort_lines(lines):
     cordinates = np.array(cordinates)[xs.argsort()]
     return cordinates.tolist()
 
+def get_points_on_line(points):
+    slope, intercept = get_slop_intercept(points)
+    if slope == None:
+        return None, None
+    xs = np.array(range(1024))
+    ys = xs * slope + intercept
+    return xs.astype(int), ys.astype(int)
+
 def get_slop_intercept(points):
     x1, y1, x2, y2 = points
     slope = (y2 - y1) // (x2 - x1) if (x2 - x1) != 0 else None
@@ -27,12 +35,69 @@ def get_slop_intercept(points):
     intercept = y1 - (slope * x1)
     return int(slope) , int(intercept)
 
+def filter_irrelevant_lines(lines):
+    new_lines = []
+    for line in lines:
+        if (np.abs(line[1] - line[3]) < 10) or (np.abs(line[0] - line[2]) < 2):
+            continue
+        else:
+            new_lines.append(line)
+    return new_lines
+
+def filter_with_point(lines, y=200, tx=10):
+    selected_y = y
+    lines = filter_irrelevant_lines(sort_lines(lines))
+    x = 0
+    info_array = []
+    for line in lines:
+        
+        if (np.abs(line[1] - line[3]) < 10) or (np.abs(line[0] - line[2]) < 2):
+            info_array.append(0)
+            continue
+
+        slope, intercept = get_slop_intercept(line)
+        slope = 0 if slope is None else slope
+        intercept = 0 if intercept is None else intercept
+        x = (selected_y - intercept) // slope if slope != 0 else 0
+        info_array.append(x)
+
+    info_array = np.array(info_array)[np.argsort(info_array)]
+    lines = np.array(lines)[np.argsort(info_array)]
+    new_array = []
+    index_array = []
+    for i, x in enumerate(info_array):
+        if not new_array or abs(x - new_array[-1]) > tx:
+            new_array.append(x)
+            index_array.append(i)
+
+    return np.array(lines)[index_array]
+        
+def check_thickness(full_lines):
+    y1 = 300
+    y2 = 500
+    y3 = 700
+    y4 = 900
+    
+    selected_coor = []
+    for group in np.array_split(full_lines, len(full_lines) // 4)
+        for line in group:
+            slope, intercept = get_slop_intercept(line)
+            slope = 0 if slope is None else slope
+            intercept = 0 if intercept is None else intercept
+            
+            x1 = (y1 - intercept) // slope if slope != 0 else 0
+            x2 = (y2 - intercept) // slope if slope != 0 else 0
+            x3 = (y3 - intercept) // slope if slope != 0 else 0
+            x4 = (y4 - intercept) // slope if slope != 0 else 0
+
+            selected_coor.append((x1, x2, x3, x4))
+
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
-image = cv2.imread(os.path.join(test_path, 'a2.bmp'))
+image = cv2.imread(os.path.join(test_path, 'wt2.bmp'))
 cv2.imshow('original', cv2.resize(image, (800, 600)))
-cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
+# cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
 
 lineImage = image.copy()
 clineImage = image.copy()
@@ -55,30 +120,34 @@ cv2.drawContours(image, contours, -1, (0, 0, 255))#, thickness = cv2.FILLED)
 # cv2.imshow('Contours', cv2.resize(image, (800, 600)))
 # cv2.imwrite(os.path.join(results_path, 'Contours.jpg'), cv2.resize(image, (800, 600)))
 
-lines = cv2.HoughLinesP(img_dilation, 1, np.pi/180, 50, np.array([]), 400, 20)
+lines = cv2.HoughLinesP(img_dilation, 1, np.pi/500, 50, np.array([]), 400, 20)
 print('[++]', np.array(lines).shape)
 
-circle_lines = []
 new_lines = sort_lines(lines)
 for x1, y1, x2, y2  in new_lines:
     xs, ys = get_points_on_line((x1, y1, x2, y2))
     if xs is not None:
         # cv2.line(lineImage, (xs[0], ys[0]), (xs[-1], ys[-1]), (255, 0, 0), 2)
         cv2.line(lineImage, (x1, y1), (x2, y2), (255, 0, 0), 2)
-        circle_lines.append((xs[0], ys[0], xs[-1], ys[-1]))
         for x, y in zip(xs, ys):
             cv2.circle(lineImage, (x,y), 2, (0,0,255), 2)
 cv2.imshow('res', cv2.resize(lineImage, (800, 600)))
-cv2.imwrite(os.path.join(results_path, 'res.jpg'), cv2.resize(lineImage, (800, 600)))
+# cv2.imwrite(os.path.join(results_path, 'res.jpg'), cv2.resize(lineImage, (800, 600)))
 
-filtered_lines = m_filter_with_slopes(lines, 0.99, 1.05, 0.99, 1.05)
+# filtered_lines = m_filter_with_slopes(lines, 0.99, 1.05, 0.99, 1.05)
+filtered_lines = filter_with_point(lines, 512, 20)
 print('[--]', len(filtered_lines))
 
 for x1, y1, x2, y2  in filtered_lines:
+    xs, ys = get_points_on_line((x1, y1, x2, y2))
     cv2.line(clineImage, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    if xs is not None:
+        for x, y in zip(xs, ys):
+            cv2.circle(clineImage, (x,y), 2, (255,0,0), 2)
 
+print(np.array_split(filtered_lines, len(filtered_lines)//4))
 cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
-cv2.imwrite(os.path.join(results_path, 'res filtered.jpg'), cv2.resize(clineImage, (800, 600)))
+# cv2.imwrite(os.path.join(results_path, 'res filtered.jpg'), cv2.resize(clineImage, (800, 600)))
 
 
 cv2.waitKey(0)

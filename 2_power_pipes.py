@@ -145,7 +145,7 @@ def m_filter_with_slopes(lines, ts_low, ts_high, ti_low, ti_high):
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
-image = cv2.imread(os.path.join(test_path, 'a2.bmp'))
+image = cv2.imread(os.path.join(test_path, 'wt.bmp'))
 cv2.imshow('original', cv2.resize(image, (800, 600)))
 cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
 # cv2.waitKey(0)
@@ -153,11 +153,11 @@ cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 
 lineImage = image.copy()
 clineImage = image.copy()
 
-# contrast = 2.5
-# brightness = -240
-# out = cv2.addWeighted( image, contrast, image, 0, brightness)
-# cv2.imshow('lightening change', cv2.resize(out, (800, 600)))
-# cv2.imwrite('lightening change.jpg', cv2.resize(out, (800, 600)))
+contrast = 2.5
+brightness = -240
+out = cv2.addWeighted( image, contrast, image, 0, brightness)
+cv2.imshow('lightening change', cv2.resize(out, (800, 600)))
+cv2.imwrite('lightening change.jpg', cv2.resize(out, (800, 600)))
 
 # cv2.waitKey(0)
 # quit()
@@ -198,9 +198,9 @@ print("Number of Contours found = " + str(len(contours)))
 # cv2.waitKey(0)
 # quit()
 
-# inverted = cv2.bitwise_not(edged)
-# cv2.imshow('Inverted', cv2.resize(inverted, (800, 600)))
-# cv2.imwrite(os.path.join(results_path, 'Inverted.jpg'), cv2.resize(inverted, (800, 600)))
+inverted = cv2.bitwise_not(edged)
+cv2.imshow('Inverted', cv2.resize(inverted, (800, 600)))
+cv2.imwrite(os.path.join(results_path, 'Inverted.jpg'), cv2.resize(inverted, (800, 600)))
 # cv2.waitKey(0)
 
 
@@ -238,7 +238,7 @@ cv2.imshow('Contours', cv2.resize(image, (800, 600)))
 cv2.imwrite(os.path.join(results_path, 'Contours.jpg'), cv2.resize(image, (800, 600)))
 # cv2.waitKey(0)
 
-lines = cv2.HoughLinesP(img_dilation, 1, np.pi/180, 50, np.array([]), 400, 20)
+lines = cv2.HoughLinesP(img_dilation, 1, np.pi/500, 50, np.array([]), 400, 20)
 print('[++]', np.array(lines).shape)
 # cordinates = []
 # if lines is not None:
