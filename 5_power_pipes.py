@@ -72,7 +72,7 @@ def filter_with_point(lines, y=200, tx=10):
 
     return np.array(lines)[index_array]
         
-def check_thickness(full_lines, diff_thresh=5, edge_thresh=3):
+def check_thickness(full_lines, diff_thresh=3, edge_thresh=3):
     y1 = 300
     y2 = 500
     y3 = 700
@@ -80,6 +80,7 @@ def check_thickness(full_lines, diff_thresh=5, edge_thresh=3):
 
     selected_coor = []
     check_array = []
+    edges_array = []
     for group in np.array_split(full_lines, len(full_lines) // 4):
         
         for line in group:
@@ -98,23 +99,27 @@ def check_thickness(full_lines, diff_thresh=5, edge_thresh=3):
         print(dist1, dist2)
 
         edge_diff = np.all(np.abs(dist1 - dist2) >= edge_thresh)
-        # right_edge = np.all(dist1 > thresh)
-        # left_edge = np.all(dist2 > thresh)
+        right_edge = np.all(dist1.max() - dist1.min() >= diff_thresh)
+        left_edge = np.all(dist2.max() - dist2.min() >= diff_thresh)
 
+        edges_array.append(right_edge)
+        edges_array.append(left_edge)
         check_array.append(edge_diff)
-    return check_array
+
+    return check_array, edges_array
 
 
 
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
-image = cv2.imread(os.path.join(test_path, 'a.bmp'))
+image = cv2.imread(os.path.join(test_path, 'wt2.bmp'))
 cv2.imshow('original', cv2.resize(image, (800, 600)))
 # cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
 
 lineImage = image.copy()
 clineImage = image.copy()
+result_image = image.copy()
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 edged = cv2.Canny(gray, 50, 255)
@@ -159,14 +164,27 @@ for x1, y1, x2, y2  in filtered_lines:
         for x, y in zip(xs, ys):
             cv2.circle(clineImage, (x,y), 2, (255,0,0), 2)
 
-try:
-    wt_pos = check_thickness(filtered_lines, 5).index(True) + 1
-    cv2.putText(clineImage, f'there is wall thickness error in tupe number {wt_pos}', (0,50), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
-except ValueError:
+error_list = []
+ct, ce = check_thickness(filtered_lines, 1, 3)
+print(ct, ce)
+for i, c in enumerate(ct):
+    if c:
+        error_list.append(i + 1)
+
+if len(error_list):
+    cv2.putText(clineImage, f'there is a wall thickness error in tupe number {error_list}', (10,50), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
+    cv2.putText(result_image, f'there is a wall thickness error in tupe number {error_list}', (10,50), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
+if  not np.all(ce):
+    cv2.putText(clineImage, 'there is an edge thickness error', (10,90), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
+    cv2.putText(result_image, 'there is an edge thickness error', (10,90), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
+else:
     cv2.putText(clineImage, 'No wall thickness error detected', (0,50), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
+    cv2.putText(result_image, 'No wall thickness error detected', (0,50), cv2.FONT_HERSHEY_SIMPLEX , 1, (0,0,255), 2)
 
 cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
+cv2.imshow('Final Result', cv2.resize(result_image, (800, 600)))
 cv2.imwrite(os.path.join(results_path, 'wall_thickness 2.jpg'), cv2.resize(clineImage, (800, 600)))
+cv2.imwrite(os.path.join(results_path, 'final result.jpg'), cv2.resize(result_image, (800, 600)))
 
 # print(check_thickness(filtered_lines, 5).index(True))
 # cv2.imwrite(os.path.join(results_path, 'res filtered.jpg'), cv2.resize(clineImage, (800, 600)))
