@@ -62,8 +62,8 @@ def filter_with_point(lines, y=200, tx=10):
         x = (selected_y - intercept) // slope if slope != 0 else 0
         info_array.append(x)
 
-    info_array = np.array(info_array)[np.argsort(info_array)]
     lines = np.array(lines)[np.argsort(info_array)]
+    info_array = np.array(info_array)[np.argsort(info_array)]
     new_array = []
     index_array = []
     for i, x in enumerate(info_array):
@@ -115,7 +115,7 @@ def check_thickness(full_lines, diff_thresh=3, edge_thresh=3):
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
-image = cv2.imread(os.path.join(test_path, 'wt2.bmp'))
+image = cv2.imread(os.path.join(test_path, 'a2.bmp'))
 cv2.imshow('original', cv2.resize(image, (800, 600)))
 # cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
 
@@ -180,7 +180,7 @@ cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
 # cv2.waitKey(0)
 # quit()
 error_list = []
-ct, ce = check_thickness(filtered_lines, 3, 3)
+ct, ce = check_thickness(filtered_lines, 4, 3)
 print(ct, ce)
 for i, c in enumerate(ct):
     if c:
