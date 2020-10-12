@@ -211,7 +211,8 @@ for z, image in enumerate(test_images):
         if xs is not None:
             for x, y in zip(xs, ys):
                 cv2.circle(clineImage, (x,y), 2, (255,0,0), 2)
-    # cv2.imshow('res filtered', cv2.resize(clineImage, (800, 600)))
+    # cv2.imshow('re
+    # s filtered', cv2.resize(clineImage, (800, 600)))
     # cv2.waitKey(0)
     # quit()
     error_list = []
