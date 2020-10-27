@@ -145,30 +145,90 @@ def m_filter_with_slopes(lines, ts_low, ts_high, ti_low, ti_high):
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
-image = cv2.imread(os.path.join(test_path, 'wt.bmp'))
+image = cv2.imread(os.path.join(test_path, 'a2.bmp'))
 cv2.imshow('original', cv2.resize(image, (800, 600)))
-cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
+# cv2.imwrite(os.path.join(results_path, 'original.jpg'), cv2.resize(image, (800, 600)))
 # cv2.waitKey(0)
 
-lineImage = image.copy()
-clineImage = image.copy()
+# lineImage = image.copy()
+# clineImage = image.copy()
 
-contrast = 2.5
-brightness = -240
-out = cv2.addWeighted( image, contrast, image, 0, brightness)
-cv2.imshow('lightening change', cv2.resize(out, (800, 600)))
-cv2.imwrite('lightening change.jpg', cv2.resize(out, (800, 600)))
+# contrast = 2.5
+# brightness = -240
+# out = cv2.addWeighted( image, contrast, image, 0, brightness)
+# cv2.imshow('lightening change', cv2.resize(out, (800, 600)))
+# cv2.imwrite('lightening change.jpg', cv2.resize(out, (800, 600)))
 
 # cv2.waitKey(0)
-# quit()
 # image = out.copy()
 #COLORMAP_RAINBOW
 #COLORMAP_BONE
 #COLORMAP_HSV
 
-# image = cv2.applyColorMap(image, cv2.COLORMAP_RAINBOW)
-# cv2.imshow('applyColorMap', cv2.resize(image, (800, 600)))
-# cv2.waitKey(0)
+# c1 = cv2.applyColorMap(image, cv2.COLORMAP_HSV)
+# cv2.imshow('applyColorMap1', cv2.resize(c1, (800, 600)))
+
+# c2 = cv2.applyColorMap(image, cv2.COLORMAP_RAINBOW)
+# cv2.imshow('applyColorMap2', cv2.resize(c2, (800, 600)))
+
+# c3 = cv2.applyColorMap(image, cv2.COLORMAP_BONE)
+# cv2.imshow('applyColorMap3', cv2.resize(c3, (800, 600)))
+
+# c4 = cv2.applyColorMap(image, cv2.COLORMAP_DEEPGREEN)
+# cv2.imshow('applyColorMap4', cv2.resize(c4, (800, 600)))
+
+# c15 = cv2.applyColorMap(image, cv2.COLORMAP_TURBO)
+# cv2.imshow('applyColorMap5', cv2.resize(c15, (800, 600)))
+
+c5 = cv2.applyColorMap(image, cv2.COLORMAP_TWILIGHT_SHIFTED)
+cv2.imshow('applyColorMap6', cv2.resize(c5, (800, 600)))
+# (hMin = 0 , sMin = 0, vMin = 0), (hMax = 179 , sMax = 130, vMax = 255)
+
+c6 = cv2.applyColorMap(image, cv2.COLORMAP_TWILIGHT)
+cv2.imshow('applyColorMap7', cv2.resize(c6, (800, 600)))
+
+hsv = cv2.cvtColor(c5, cv2.COLOR_BGR2HSV)
+
+# Threshold of blue in HSV space
+lower_blue = np.array([0, 0, 0])
+upper_blue = np.array([179, 130, 255])
+
+# preparing the mask to overlay
+mask = cv2.inRange(hsv, lower_blue, upper_blue)
+# The black region in the mask has the value of 0,
+# so when multiplied with original image removes all non-blue regions
+result = cv2.bitwise_and(c5, c5, mask = mask)
+
+cv2.imshow('pipe color filtered', cv2.resize(result, (800, 600)))
+
+# c7 = cv2.applyColorMap(image, cv2.COLORMAP_CIVIDIS)
+# cv2.imshow('applyColorMap8', cv2.resize(c7, (800, 600)))
+
+# c8 = cv2.applyColorMap(image, cv2.COLORMAP_VIRIDIS)
+# cv2.imshow('applyColorMap9', cv2.resize(c8, (800, 600)))
+
+# c9 = cv2.applyColorMap(image, cv2.COLORMAP_PLASMA)
+# cv2.imshow('applyColorMap10', cv2.resize(c9, (800, 600)))
+
+# c10 = cv2.applyColorMap(image, cv2.COLORMAP_INFERNO)
+# cv2.imshow('applyColorMap11', cv2.resize(c10, (800, 600)))
+
+# c11 = cv2.applyColorMap(image, cv2.COLORMAP_MAGMA)
+# cv2.imshow('applyColorMap12', cv2.resize(c11, (800, 600)))
+
+# c12 = cv2.applyColorMap(image, cv2.COLORMAP_PARULA)
+# cv2.imshow('applyColorMap13', cv2.resize(c12, (800, 600)))
+
+# c13 = cv2.applyColorMap(image, cv2.COLORMAP_HOT)
+# cv2.imshow('applyColorMap14', cv2.resize(c13, (800, 600)))
+
+# c14 = cv2.applyColorMap(image, cv2.COLORMAP_PINK)
+# cv2.imshow('applyColorMap15', cv2.resize(c14, (800, 600)))
+
+
+
+cv2.waitKey(0)
+quit()
 
 # Find Canny edges
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

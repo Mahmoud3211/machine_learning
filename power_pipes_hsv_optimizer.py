@@ -7,7 +7,7 @@ def nothing(x):
     pass
 
 # Load image
-image = cv2.imread(os.path.join(test_path, 'f1.bmp'))
+image = cv2.imread(os.path.join(test_path, 'a2.bmp'))
 
 # contrast = 2.5
 # brightness = -180
@@ -16,7 +16,7 @@ image = cv2.imread(os.path.join(test_path, 'f1.bmp'))
 # cv2.imwrite('lightening change.jpg', cv2.resize(out, (800, 600)))
 
 
-# image = cv2.applyColorMap(image, cv2.COLORMAP_RAINBOW)
+image = cv2.applyColorMap(image, cv2.COLORMAP_TWILIGHT_SHIFTED)
 # Create a window
 cv2.namedWindow('image')
 cv2.resizeWindow('image', 400, 150)
