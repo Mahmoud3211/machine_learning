@@ -47,9 +47,9 @@ class wall_thickness_detector:
     def filter_irrelevant_lines(self, lines):
         new_lines = []
         for line in lines:
-            if (np.abs(1024 - line[0]) > 1015 or np.abs(1024 - line[0]) < 10) and (np.abs(1024 - line[2]) > 1015 or np.abs(1024 - line[2]) < 10):
+            if (np.abs(1024 - line[0]) >= 950 or np.abs(1024 - line[0]) <= 75) and (np.abs(1024 - line[2]) >= 950 or np.abs(1024 - line[2]) <= 75):
                 continue
-            if (np.abs(1024 - line[1]) > 1015 or np.abs(1024 - line[1]) < 10) and (np.abs(1024 - line[3]) > 1015 or np.abs(1024 - line[3]) < 10):
+            if (np.abs(1024 - line[1]) >= 950 or np.abs(1024 - line[1]) <= 75) and (np.abs(1024 - line[3]) >= 950 or np.abs(1024 - line[3]) <= 75):
                 continue
             else:
                 new_lines.append(line)
@@ -123,7 +123,7 @@ class wall_thickness_detector:
     def draw_flaws(self, img, filtered_lines, checked_pipes, checked_edges):
         flawed_pips = [i for i, c in enumerate(checked_pipes) if c]
         flawed_edges = [i for i, c in enumerate(checked_edges) if c]
-
+        
         flawed_groups = np.array(np.array_split(filtered_lines, len(filtered_lines) // 4))[flawed_pips]
         flawed_edges =  np.array(np.array_split(filtered_lines, len(filtered_lines) // 2))[flawed_edges]
         
