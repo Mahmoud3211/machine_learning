@@ -3,7 +3,6 @@ import numpy as np
 import os
 from pp_utils import wall_thickness_detector
 
-
 results_path = os.path.join(os.getcwd(), 'results')
 test_path = os.path.join(os.getcwd(), 'test')
 
