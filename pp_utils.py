@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 from PIL import Image
+
 class wall_thickness_detector:
     
     def __init__(self, empty_image):
@@ -152,7 +153,7 @@ class wall_thickness_detector:
             p14 = self.get_single_point_on_line(edge[1], 150)
             
             poly_points_1 = np.array([p11, p12, p13, p14])
-            cv2.fillPoly(overlay2,[poly_points_1], (0,0,255))
+            cv2.fillPoly(overlay2,[poly_points_1], (255,0,0))
         
         alpha = 0.7
         alpha1 = 0.5
@@ -162,6 +163,7 @@ class wall_thickness_detector:
         # cv2.imwrite('./empty image poly.jpg', cv2.resize(img, (800, 600)))
         message = ""
         error_list = [i + 1 for i, c in enumerate(checked_pipes) if c]
+        edges = []
         messages_list = []
         if len(error_list):
             message = f'there is a wall thickness error in tupe number {error_list}'
@@ -174,8 +176,11 @@ class wall_thickness_detector:
         else:
             message = 'No wall thickness error detected'
             messages_list.append(message)                    
-            
-        return Image.fromarray(img), messages_list
+        
+        ps = len(error_list)
+        es = np.sum((np.array(edges))%2)
+
+        return Image.fromarray(img), messages_list, max(ps, es)
 
     def detect(self):
 
